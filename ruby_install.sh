@@ -1,10 +1,10 @@
 #!/bin/bash
 CYAN='\e[0;36m'
 NC='\e[0m'
-printf "설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력안하면 최신으로 설치합니다.\n"
-printf "입력 : "
+printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력안하면 최신으로 설치합니다.\n"
+printf "입력 : ${NC}"
 read ruby_version
-echo "$ruby_version 이 설치 됩니다."
+echo "${CYAN}$ruby_version 이 설치 됩니다.${NC}"
 rvm install ruby-$ruby_version
 rvm --default use ruby-$ruby_version
 
@@ -25,6 +25,7 @@ sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger xen
 echo -e "Repository 업데이트 중..."
 sudo apt-get update > /dev/null
 echo -e "${CYAN}Repository 업데이트 까지 끝${NC}"
+echo -e "\n${CYAN}******* gem: command not found 오류가 난 경우, rvm reinstall ruby-(루비버전)\n후에 gem install bundler --no-rdoc --no-ri 을 실행하세요.${NC}"
 unset ruby_version
 unset CYAN
 unset NC

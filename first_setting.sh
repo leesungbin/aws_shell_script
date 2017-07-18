@@ -2,7 +2,7 @@
 CYAN='\e[0;36m'
 NC='\e[0m'
 echo -e "${CYAN}======여러가지 준비 시작======${NC}"
-echo -e "repository 업데이트 중..."
+echo -e "${CYAN}Repository 업데이트 중...${NC}"
 sudo apt-get update > /dev/null
 echo -e "${CYAN}업데이트 끝${NC}"
 sudo apt-get install -y curl gnupg build-essential >/dev/null

@@ -2,7 +2,9 @@
 CYAN='\e[0;36m'
 NC='\e[0m'
 echo -e "${CYAN}Passenger, Nginx 설치 및 설정 시작${NC}"
-sudo apt-get install -y nginx-extras passenger
+echo -e "${CYAN}설치중...${NC}"
+sudo apt-get install -y nginx-extras passenger >/dev/null
+echo -e "${CYAN}설치끝${NC}"
 sudo touch /etc/nginx/temp.txt
 sudo -i -H sh -c " sed -e '1,63d' /etc/nginx/nginx.conf > /etc/nginx/temp.txt; sed -i '63,93d' /etc/nginx/nginx.conf; printf '\tinclude /etc/nginx/passenger.conf;\n' >> /etc/nginx/nginx.conf; cat /etc/nginx/temp.txt >> /etc/nginx/nginx.conf; exit"
 sudo rm -r /etc/nginx/temp.txt
@@ -43,9 +45,12 @@ fi
 cd /var/www/$myapp
 sudo -u $myappuser -H git clone $github_address code
 
+export ruby_version
+export myapp
+
 sudo -u $myappuser -H sh -c "
 rvm use ruby-$ruby_version;
-cd /var/www/myapp/code;
+cd /var/www/$myapp/code;
 bundle install --deployment --without development test -j 2;
 printf '  adapter: sqlite3' >> config/database.yml;
 secret_key=bundle exec rake secret;
@@ -64,10 +69,13 @@ read server_name
 echo $server_name
 echo "/var/www/$myapp/code/public"
 
+export -n ruby_version
+unset ruby_version
 unset myappuser
+export -n myapp
 unset myapp
 unset github_address
 unset CYAN
 unset NC
 export -n command_address
-unset command-address
+unset command_address
