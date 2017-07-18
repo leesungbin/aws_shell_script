@@ -45,8 +45,8 @@ fi
 cd /var/www/$myapp
 sudo -u $myappuser -H git clone $github_address code
 
-RV=ruby_version
-MA=myapp
+RV=$ruby_version
+MA=$myapp
 
 export RV
 export MA
