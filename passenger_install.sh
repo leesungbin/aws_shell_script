@@ -29,11 +29,11 @@ sudo sh -c "chmod 600 ~$myappuser/.ssh/*"
 
 sudo mkdir -p /var/www/$myapp
 sudo chown $myappuser: /var/www/$myapp
-echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/aws.git)\n${NC}"
+echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/uosHomework.git)\n${NC}"
 printf "입력 :"
 read github_address
 if [ -z "$github_address" ] ; then
-    github_address="https://github.com/leesungbin/aws.git"
+    github_address="https://github.com/leesungbin/uosHomework.git"
 fi
 cd /var/www/$myapp
 sudo -u $myappuser -H git clone --branch=end_result $github_address code
