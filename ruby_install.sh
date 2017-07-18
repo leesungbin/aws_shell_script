@@ -8,7 +8,7 @@ echo "$ruby_version 이 설치 됩니다."
 rvm install ruby-$ruby_version
 rvm --default use ruby-$ruby_version
 
-sudo gem install bundler --no-rdoc --no-ri
+gem install bundler --no-rdoc --no-ri
 echo -e "${CYAN}****************bundle gem 설치(오류확인)************\n${NC}"
 echo -e "${CYAN}노드 설치중${NC}"
 sudo apt-get install -y nodejs > /dev/null
