@@ -21,9 +21,9 @@ fi
 if [ -z "$myappuser" ] ; then
     myappuser="myappuser"
 fi
-echo "${CYAN}=========================================="
-echo "app 이름 : $myapp\nuser 이름 : $myappuser"
-echo "==========================================${NC}"
+echo -e "${CYAN}=========================================="
+echo -e "app 이름 : $myapp\nuser 이름 : $myappuser"
+echo -e "==========================================${NC}"
 sudo adduser $myappuser
 sudo mkdir -p ~$myappuser/.ssh
 touch $HOME/.ssh/authorized_keys
@@ -42,3 +42,32 @@ if [ -z "$github_address" ] ; then
 fi
 cd /var/www/$myapp
 sudo -u $myappuser -H git clone $github_address code
+
+sudo -u $myappuser -H sh -c "
+rvm use ruby-$ruby_version;
+cd /var/www/myapp/code;
+bundle install --deployment --without development test -j 2;
+printf '  adapter: sqlite3' >> config/database.yml;
+secret_key=bundle exec rake secret;
+sudo sed -i '22s/' config/secrets.yml;
+echo '  secret_key_base: $secret_key' >> config/secrets.yml;
+
+chmod 700 config debchmod 600 config/database.yml config/secrets.yml;
+bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
+export command_address= passenger-config about ruby-command | sed -e '2s/';
+echo $command_address;
+exit;
+"
+echo $command_address
+printf "server name 입력 : "
+read server_name
+echo $server_name
+echo "/var/www/$myapp/code/public"
+
+unset myappuser
+unset myapp
+unset github_address
+unset CYAN
+unset NC
+export -n command_address
+unset command-address

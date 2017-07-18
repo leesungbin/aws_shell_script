@@ -25,3 +25,6 @@ sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger xen
 echo -e "Repository 업데이트 중..."
 sudo apt-get update > /dev/null
 echo -e "${CYAN}Repository 업데이트 까지 끝${NC}"
+unset ruby_version
+unset CYAN
+unset NC
