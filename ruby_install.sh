@@ -18,7 +18,14 @@ if [ $error_occured == "1" ] ; then
     rvm reinstall ruby-$ruby_version;
     gem install bundler --no-rdoc --no-ri;
 fi
-
+printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
+read error_occured;
+while [ $error_occured == "1" ] ; do
+    sudo gem install bundler --no-rdoc --no-ri;
+    printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
+    printf "${CYAN}제대로 젬이 설치되지 않는다고 계속되면, 망한겁니다. 왜 이러는지 모르겠음.\n";
+    read error_occured;
+done
 echo -e "${CYAN}노드 설치중${NC}"
 sudo apt-get install -y nodejs > /dev/null
 
@@ -43,7 +50,7 @@ echo -e "${CYAN}설치끝${NC}"
 sudo touch /etc/nginx/temp.txt
 sudo -i -H sh -c " sed -e '1,63d' /etc/nginx/nginx.conf > /etc/nginx/temp.txt; sed -i '63,93d' /etc/nginx/nginx.conf; printf '\tinclude /etc/nginx/passenger.conf;\n' >> /etc/nginx/nginx.conf; cat /etc/nginx/temp.txt >> /etc/nginx/nginx.conf; exit"
 sudo rm -r /etc/nginx/temp.txt
-echo -e "${CYAN}설정 끝${NC}"
+echo -e "${CYAN}설정끝${NC}"
 sudo service nginx restart
 echo -e "${CYAN}nginx를 재시작 했습니다.\n${NC}"
 
@@ -71,7 +78,7 @@ sudo sh -c "chmod 600 ~$myappuser/.ssh/*"
 
 sudo mkdir -p /var/www/$myapp
 sudo chown $myappuser: /var/www/$myapp
-echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/uosHomework.git)\n${NC}"
+echo -e "${CYAN}\n\n루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/uosHomework.git)\n${NC}"
 printf "입력 :"
 read github_address
 if [ -z "$github_address" ] ; then
@@ -79,13 +86,15 @@ if [ -z "$github_address" ] ; then
 fi
 cd /var/www/$myapp
 sudo -u $myappuser -H git clone $github_address code
+echo "${CYAN}clone 끝${NC}"
 
 MA=$myapp
 export MA
 
-sudo -u $myappuser -H sh -c "
+sudo -u $myappuser sh -c "
 rvm use ruby-$RV;
 cd /var/www/$MA/code;
+echo 'changed directory to /var/www/$MA/code';
 bundle install --deployment --without development test -j 2;
 printf '  adapter: sqlite3' >> config/database.yml;
 secret_key=bundle exec rake secret;
@@ -94,7 +103,7 @@ echo '  secret_key_base: $secret_key' >> config/secrets.yml;
 echo '수정된 부분 : ';
 tail -n 1 config/secrets.yml;
 echo '====================================================================';
-chmod 700 config debchmod 600 config/database.yml config/secrets.yml;
+chmod 700 config db; chmod 600 config/database.yml config/secrets.yml;
 bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
 export COMMAND_ADDRESS= passenger-config about ruby-command | sed -e '2s/';
 echo $COMMAND_ADDRESS;
