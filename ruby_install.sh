@@ -13,10 +13,9 @@ echo -e "${CYAN}****************bundle gem 설치(오류확인)************\n${N
 printf "${CYAN}오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n"
 printf "입력 : ${NC}"
 read error_occured
-if [ $error_occured == "1"]
-then
-rvm reinstall ruby-$ruby_version
-gem install bundler --no-rdoc --no-ri
+if [ $error_occured == "1"] ; then
+    rvm reinstall ruby-$ruby_version;
+    gem install bundler --no-rdoc --no-ri;
 fi
 
 echo -e "${CYAN}노드 설치중${NC}"
