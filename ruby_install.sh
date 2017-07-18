@@ -26,6 +26,4 @@ echo -e "Repository 업데이트 중..."
 sudo apt-get update > /dev/null
 echo -e "${CYAN}Repository 업데이트 까지 끝${NC}"
 echo -e "\n${CYAN}******* gem: command not found 오류가 난 경우, rvm reinstall ruby-(루비버전)\n후에 gem install bundler --no-rdoc --no-ri 을 실행하세요.${NC}"
-unset ruby_version
-unset CYAN
-unset NC
+export RV=$ruby_version
