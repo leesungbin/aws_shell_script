@@ -36,4 +36,4 @@ if [ -z "$github_address" ] ; then
     github_address="https://github.com/leesungbin/uosHomework.git"
 fi
 cd /var/www/$myapp
-sudo -u $myappuser -H git clone --branch=end_result $github_address code
+sudo -u $myappuser -H git clone $github_address code
