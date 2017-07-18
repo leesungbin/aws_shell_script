@@ -10,10 +10,11 @@ rvm --default use ruby-$ruby_version
 
 gem install bundler --no-rdoc --no-ri
 echo -e "${CYAN}****************bundle gem 설치(오류확인)************\n${NC}"
+echo -e "${CYAN}1 gem installed 가 뜨면 정상${NC}"
 printf "${CYAN}오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n"
 printf "입력 : ${NC}"
 read error_occured
-if [ $error_occured == "1"] ; then
+if [ $error_occured == "1" ] ; then
     rvm reinstall ruby-$ruby_version;
     gem install bundler --no-rdoc --no-ri;
 fi
@@ -33,7 +34,7 @@ sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger xen
 echo -e "Repository 업데이트 중..."
 sudo apt-get update > /dev/null
 echo -e "${CYAN}Repository 업데이트 까지 끝${NC}"
-echo -e "\n${CYAN}******* gem: command not found 오류가 난 경우, rvm reinstall ruby-(루비버전)\n후에 gem install bundler --no-rdoc --no-ri 을 실행하세요.${NC}"
+# echo -e "\n${CYAN}******* gem: command not found 오류가 난 경우, rvm reinstall ruby-(루비버전)\n후에 gem install bundler --no-rdoc --no-ri 을 실행하세요.${NC}"
 export RV=$ruby_version
 echo -e "${CYAN}Passenger, Nginx 설치 및 설정 시작${NC}"
 echo -e "${CYAN}설치중...${NC}"
@@ -80,11 +81,9 @@ cd /var/www/$myapp
 sudo -u $myappuser -H git clone $github_address code
 
 MA=$myapp
-
 export MA
+
 sudo -u $myappuser -H sh -c "
-echo $RV;
-echo $MA;
 rvm use ruby-$RV;
 cd /var/www/$MA/code;
 bundle install --deployment --without development test -j 2;
@@ -92,7 +91,9 @@ printf '  adapter: sqlite3' >> config/database.yml;
 secret_key=bundle exec rake secret;
 sudo sed -i '22s/' config/secrets.yml;
 echo '  secret_key_base: $secret_key' >> config/secrets.yml;
-
+echo '수정된 부분 : ';
+tail -n 1 config/secrets.yml;
+echo '====================================================================';
 chmod 700 config debchmod 600 config/database.yml config/secrets.yml;
 bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
 export COMMAND_ADDRESS= passenger-config about ruby-command | sed -e '2s/';
