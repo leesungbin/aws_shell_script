@@ -5,7 +5,7 @@ echo -e "${CYAN}======여러가지 준비 시작======${NC}"
 echo -e "${CYAN}Repository 업데이트 중...${NC}"
 sudo apt-get update > /dev/null
 echo -e "${CYAN}업데이트 끝\n${NC}"
-echo -e "${CYAN}아래 에러 무시, 다른 거 또 설치중${NC}"
+echo -e "${CYAN}아래에 오류가 발생하면, 명령이 다 끝난후,\nsudo -i -H sh -c \" echo 'LC_ALL=\"en_US.UTf-8\"' >> /etc/environment \"\n을 입력해주세요.${NC}"
 sudo apt-get install -y curl gnupg build-essential >/dev/null
 echo -e "${CYAN}\ncurl, gnupg, build-essential 설치 끝\n${NC}"
 echo -e "${CYAN}Key를 받는 중입니다...${NC}"
