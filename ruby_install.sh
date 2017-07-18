@@ -4,11 +4,12 @@ NC='\e[0m'
 printf "설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력안하면 최신으로 설치합니다.\n"
 printf "입력 : "
 read ruby_version
+echo "$ruby_version 이 설치 됩니다."
 rvm install ruby-$ruby_version
 rvm --default use ruby-$ruby_version
 
 sudo gem install bundler --no-rdoc --no-ri
-echo -e "${CYAN}****************bundle gem 설치 완료(오류확인)************\n${NC}"
+echo -e "${CYAN}****************bundle gem 설치(오류확인)************\n${NC}"
 echo -e "${CYAN}노드 설치중${NC}"
 sudo apt-get install -y nodejs > /dev/null
 
