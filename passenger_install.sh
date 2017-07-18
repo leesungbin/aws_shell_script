@@ -1,4 +1,6 @@
 #!/bin/bash
+CYAN='\e[0;36m'
+NC='\e[0m'
 echo -e "${CYAN}Passenger, Nginx 설치 및 설정 시작${NC}"
 sudo apt-get install -y nginx-extras passenger
 sudo touch /etc/nginx/temp.txt
@@ -19,6 +21,9 @@ fi
 if [ -z "$myappuser" ] ; then
     myappuser="myappuser"
 fi
+echo "${CYAN}=========================================="
+echo "app 이름 : $myapp\nuser 이름 : $myappuser"
+echo "==========================================${NC}"
 sudo adduser $myappuser
 sudo mkdir -p ~$myappuser/.ssh
 touch $HOME/.ssh/authorized_keys
