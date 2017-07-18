@@ -45,12 +45,16 @@ fi
 cd /var/www/$myapp
 sudo -u $myappuser -H git clone $github_address code
 
-export ruby_version
-export myapp
+RV=ruby_version
+MA=myapp
 
+export RV
+export MA
 sudo -u $myappuser -H sh -c "
-rvm use ruby-$ruby_version;
-cd /var/www/$myapp/code;
+echo $RV;
+echo $MA;
+rvm use ruby-$RV;
+cd /var/www/$MA/code;
 bundle install --deployment --without development test -j 2;
 printf '  adapter: sqlite3' >> config/database.yml;
 secret_key=bundle exec rake secret;
@@ -59,23 +63,25 @@ echo '  secret_key_base: $secret_key' >> config/secrets.yml;
 
 chmod 700 config debchmod 600 config/database.yml config/secrets.yml;
 bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
-export command_address= passenger-config about ruby-command | sed -e '2s/';
-echo $command_address;
+export COMMAND_ADDRESS= passenger-config about ruby-command | sed -e '2s/';
+echo $COMMAND_ADDRESS;
 exit;
 "
-echo $command_address
+echo $COMMAND_ADDRESS
 printf "server name 입력 : "
 read server_name
 echo $server_name
 echo "/var/www/$myapp/code/public"
 
-export -n ruby_version
+export -n RV
+unset RV
 unset ruby_version
 unset myappuser
-export -n myapp
+export -n MA
+unset MA
 unset myapp
 unset github_address
 unset CYAN
 unset NC
-export -n command_address
-unset command_address
+export -n COMMAND_ADDRESS
+unset COMMAND_ADDRESS
