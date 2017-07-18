@@ -19,14 +19,12 @@ if [ $error_occured == "1" ] ; then
     rvm --default use ruby-$ruby_version
     gem install bundler --no-rdoc --no-ri;
 fi
-printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
-read error_occured;
 while [ $error_occured == "1" ] ; do
-    sudo gem install bundler --no-rdoc --no-ri;
-    rvm --default use ruby-$ruby_version
     printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
     printf "${CYAN}제대로 젬이 설치되지 않는다고 계속되면, 망한겁니다. 왜 이러는지 모르겠음.\n";
     read error_occured;
+    sudo gem install bundler --no-rdoc --no-ri;
+    rvm --default use ruby-$ruby_version
 done
 echo -e "${CYAN}노드 설치중${NC}"
 sudo apt-get install -y nodejs > /dev/null
@@ -88,22 +86,23 @@ if [ -z "$github_address" ] ; then
 fi
 cd /var/www/$myapp
 sudo -u $myappuser -H git clone $github_address code
-echo "${CYAN}clone 끝${NC}"
+echo -e "${CYAN}clone 끝${NC}"
 
 MA=$myapp
 export MA
 
-sudo -u $myappuser sh -c "
+sudo -u $myappuser -H sh -lc "
 rvm use ruby-$RV;
 cd /var/www/$MA/code;
 echo 'changed directory to /var/www/$MA/code';
-bundle install --deployment --without development test -j 2;
+bundle install --deployment --without development test;
 printf '  adapter: sqlite3' >> config/database.yml;
-secret_key=bundle exec rake secret;
+
 sudo sed -i '22s/' config/secrets.yml;
-echo '  secret_key_base: $secret_key' >> config/secrets.yml;
+echo '  secret_key_base:  >> config/secrets.yml;
+bundle exec rake secret >> config/secrets.yml;
 echo '수정된 부분 : ';
-tail -n 1 config/secrets.yml;
+tail -n 5 config/secrets.yml;
 echo '====================================================================';
 chmod 700 config db; chmod 600 config/database.yml config/secrets.yml;
 bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
