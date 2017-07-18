@@ -16,12 +16,14 @@ printf "입력 : ${NC}"
 read error_occured
 if [ $error_occured == "1" ] ; then
     rvm reinstall ruby-$ruby_version;
+    rvm --default use ruby-$ruby_version
     gem install bundler --no-rdoc --no-ri;
 fi
 printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
 read error_occured;
 while [ $error_occured == "1" ] ; do
     sudo gem install bundler --no-rdoc --no-ri;
+    rvm --default use ruby-$ruby_version
     printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
     printf "${CYAN}제대로 젬이 설치되지 않는다고 계속되면, 망한겁니다. 왜 이러는지 모르겠음.\n";
     read error_occured;
