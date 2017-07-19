@@ -53,7 +53,9 @@ if [ -f ".progress" ] ; then
             echo -e "Repository 업데이트 중..."
             sudo apt-get update > /dev/null
             echo -e "${CYAN}Repository 업데이트 까지 끝${NC}"
+            
             # echo -e "\n${CYAN}******* gem: command not found 오류가 난 경우, rvm reinstall ruby-(루비버전)\n후에 gem install bundler --no-rdoc --no-ri 을 실행하세요.${NC}"
+
             export RV=$ruby_version
             echo -e "${CYAN}Passenger, Nginx 설치 및 설정 시작${NC}"
             echo -e "${CYAN}설치중...${NC}"
@@ -68,7 +70,88 @@ if [ -f ".progress" ] ; then
             echo "3" > ~/.progress;
         ;;
         "3")
-            echo "step 3";
+            echo -e "${CYAN}서버에 루비를 올리기 위한 작업을 시작합니다.\n원하는대로 app이름과 추가할 username을 입력하세요(enter => default)${NC}"
+            printf "app이름 : "
+            read myapp
+            printf "username : "
+            read myappuser
+            if [ -z "$myapp" ] ; then
+                myapp="myapp"
+            fi
+            if [ -z "$myappuser" ] ; then
+                myappuser="myappuser"
+            fi
+            echo -e "${CYAN}=========================================="
+            echo -e "app 이름 : $myapp\nuser 이름 : $myappuser"
+            echo -e "==========================================${NC}"
+            sudo adduser $myappuser
+            sudo mkdir -p ~$myappuser/.ssh
+            touch $HOME/.ssh/authorized_keys
+            sudo sh -c "cat $HOME/.ssh/authorized_keys >> ~$myappuser/.ssh/authorized_keys"
+            sudo chown -R $myappuser: ~$myappuser/.ssh
+            sudo chmod 700 ~$myappuser/.ssh
+            sudo sh -c "chmod 600 ~$myappuser/.ssh/*"
+
+            sudo mkdir -p /var/www/$myapp
+            sudo chown $myappuser: /var/www/$myapp
+            echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/uosHomework.git)\n${NC}"
+            printf "입력 :"
+            read github_address
+            if [ -z "$github_address" ] ; then
+                github_address="https://github.com/leesungbin/uosHomework.git"
+            fi
+            cd /var/www/$myapp
+            sudo -u $myappuser -H git clone $github_address code
+
+            MA=$myapp
+
+            export MA
+            sudo -u $myappuser -H sh -c "
+            # Load RVM into a shell session *as a function*
+            # Loading RVM *as a function* is mandatory
+            # so that we can use 'rvm use <specific version>'
+            if [[ -s \"$HOME/.rvm/scripts/rvm\" ]] ; then
+                # First try to load from a user install
+                source \"$HOME/.rvm/scripts/rvm\";
+                echo \"using user install $HOME/.rvm/scripts/rvm\";
+            elif [[ -s \"/usr/local/rvm/scripts/rvm\" ]] ; then
+                # Then try to load from a root install
+                source \"/usr/local/rvm/scripts/rvm\";
+                echo \"using root install /usr/local/rvm/scripts/rvm\";
+            else
+                echo \"ERROR: An RVM installation was not found.\n\";
+            fi
+
+            rvm use ruby-$RV;
+
+            cd /var/www/$MA/code;
+            bundle install --deployment --without development test -j 2;
+            printf '  adapter: sqlite3' >> config/database.yml;
+            secret_key=`bundle exec rake secret`;
+            sudo sed -i '22s/' config/secrets.yml;
+            echo '  secret_key_base: $secret_key' >> config/secrets.yml;
+
+            chmod 700 config deb;
+            chmod 600 config/database.yml config/secrets.yml;
+            bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
+            COM=`passenger-config about ruby-command | grep -i \"Command:\" `;
+            COM=${COM:12:100};
+            export $COM;
+            exit;
+            "
+            echo "4" > ~/.progress;
+        ;;
+        "4")
+            echo "step4";
+            echo -e "${CYAN}server 주소를 입력하세요(http:// 제외)"
+            printf "입력 : ${NC}";
+            read server;
+            #need to edit /etc/nginx/sites-enabled/myapp.conf
+            sed -i "3,11d" /etc/nginx/sites-enabled/$MA.conf;
+            printf "\tserver_name $server;\n\n\troot /var/www/$MA/code/public;\n\n\tpassenger_enabled on;\n\tpassenger_ruby $COM;\n}" >> /etc/nginx/sites-enabled/$MA.conf;
+            #finish;
+            sudo service nginx restart;
+            echo -e "${CYAN}서버 설정 끝, 오류가 없는지 확인하세요.${NC}";
         ;;
     esac
 
