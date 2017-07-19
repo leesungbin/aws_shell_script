@@ -144,7 +144,8 @@ if [ -f ".progress" ] ; then
             bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
             COM=`passenger-config about ruby-command | grep -i "Command:" `;
             COM=${COM:11:100};
-            echo -e "${CYAN}마지막으로 서버세팅이 남았습니다. /home/abuntu/aws 로 가서 allinone.sh를 실행하세요.${NC}"
+            echo -e "${CYAN}마지막으로 서버세팅이 남았습니다.${NC}"
+            echo -e "${CYAN}cd /home/abuntu/aws; ./allinone.sh 을 복사,붙여넣기 하세요."
             
             sed -i "4d" /home/ubuntu/.progress;
             echo "comn:$COM" >> /home/ubuntu/.progress; 
