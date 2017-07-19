@@ -53,7 +53,7 @@ if [ -f ".progress" ] ; then
             # Add our APT repository
             echo -e "${CYAN}Apt repository 추가${NC}"
             sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger xenial main > /etc/apt/sources.list.d/passenger.list'
-            echo -e "Repository 업데이트 중..."
+            echo -e "${CYAN}Repository 업데이트 중...${NC}"
             sudo apt-get update > /dev/null
             echo -e "${CYAN}Repository 업데이트 까지 끝${NC}"
             
@@ -71,7 +71,7 @@ if [ -f ".progress" ] ; then
             sudo service nginx restart
             echo -e "${CYAN}nginx를 재시작 했습니다.\n${NC}"
 
-            sed -i "2d/" ~/.progress;
+            sed -i "2d" ~/.progress;
             echo "3" >> ~/.progress;
         ;;
         "3")
@@ -107,13 +107,10 @@ if [ -f ".progress" ] ; then
             fi
             cd /var/www/$myapp
             sudo -u $myappuser -H git clone $github_address code
-
-            MA=$myapp
-            export MA
             
             echo -e "${CYAN}cd /home/ubuntu/awset; ./allinone.sh 을 복사,붙여넣기 해주세요.${NC}";
 
-            sed -i "2d/" ~/.progress;
+            sed -i "2d" ~/.progress;
             printf "appn:$myapp\nusen:$myappuser\n" >> ~/.progress;
             echo "4" >> ~/.progress;
 
@@ -129,8 +126,8 @@ if [ -f ".progress" ] ; then
             MA=${temp:5:100};
 
             echo -e "${CYAN}$myappuser shell에서 설정을 시작합니다.${NC}";
-            source "/usr/local/rvm/scripts/rvm";
-            echo "using root install /usr/local/rvm/scripts/rvm";
+            # source "/usr/local/rvm/scripts/rvm";
+            # echo "using root install /usr/local/rvm/scripts/rvm";
             # export PATH=$PATH:/var/lib/gems/$RV/bin;
             rvm use ruby-$RV;
 
@@ -138,7 +135,7 @@ if [ -f ".progress" ] ; then
             bundle install --deployment --without development test -j 2;
             printf '  adapter: sqlite3' >> config/database.yml;
             secret_key=`bundle exec rake secret`;
-            sed -i "22d/" config/secrets.yml;
+            sed -i "22d" config/secrets.yml;
             echo '  secret_key_base: $secret_key' >> config/secrets.yml;
 
             chmod 700 config db;
@@ -148,7 +145,7 @@ if [ -f ".progress" ] ; then
             COM=${COM:11:100};
             echo -e "${CYAN}마지막으로 서버세팅이 남았습니다. /home/abuntu/aws 로 가서 allinone.sh를 실행하세요.${NC}"
             
-            sed -i "4d/" /home/ubuntu/.progress;
+            sed -i "4d" /home/ubuntu/.progress;
             echo "comn:$COM" >> /home/ubuntu/.progress; 
             echo "5" >> /home/ubuntu/.progress;
             exit;
@@ -179,7 +176,7 @@ else
     echo -e "${CYAN}Repository 업데이트 중...${NC}";
     sudo apt-get update > /dev/null;
     echo -e "${CYAN}업데이트 끝\n${NC}";
-    echo -e "${CYAN}아래에 오류가 발생하면, 명령이 다 끝난후,\nsudo -i -H sh -c \" echo 'LC_ALL=\\\"en_US.UTf-8\\\"' >> /etc/environment \"\n을 입력해주세요.${NC}";
+    # echo -e "${CYAN}아래에 오류가 발생하면, 명령이 다 끝난후,\nsudo -i -H sh -c \" echo 'LC_ALL=\\\"en_US.UTf-8\\\"' >> /etc/environment \"\n을 입력해주세요.${NC}";
     sudo apt-get install -y curl gnupg build-essential >/dev/null;
     echo -e "${CYAN}\ncurl, gnupg, build-essential 설치 끝\n${NC}";
     echo -e "${CYAN}Key를 받는 중입니다...${NC}";
@@ -190,6 +187,7 @@ else
     echo -e "${CYAN}서버 터미널에 다시 접속하세요.${NC}";
     touch ~/.progress;
     echo 1 > ~/.progress;
+    chmod 666 ~/.progress;
 fi
 export -n CYAN;
 export -n NC;
