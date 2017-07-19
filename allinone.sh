@@ -3,7 +3,7 @@ CYAN='\e[0;36m';
 NC='\e[0m';
 export CYAN;
 export NC;
-# 단계 : 1 : first setting ,2 : install ruby ,3 : 노드,passenger 설치, 4 : 깃-루비 준비, 5 : deploying 작업, 6 : swap file
+# 단계 : null : first setting ,1 : install ruby ,2 : 노드,passenger 설치, 3 : 깃-루비 준비, 4 : deploying 작업, 5 : final serverset, 6: swapfile
 
 cd /home/ubuntu;
 
@@ -118,6 +118,7 @@ if [ -f ".progress" ] ; then
             echo "4" >> ~/.progress;
 
             sudo -u $myappuser -H bash -l;
+        ;;
         "4")
             cd ~;
             temp=`grep appn /home/ubuntu/.progress` ;
