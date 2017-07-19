@@ -1,6 +1,8 @@
 #!/bin/bash
-CYAN='\e[0;36m'
-NC='\e[0m'
+CYAN='\e[0;36m';
+NC='\e[0m';
+export CYAN;
+export NC;
 # 단계 : 1 : first setting ,2 : install ruby ,3 : 노드,passenger 설치, 4 : 깃-루비 준비, 5 : deploying 작업, 6 : swap file
 
 cd ~
@@ -14,18 +16,18 @@ if [ -f ".progress" ] ; then
             printf "입력 : ${NC}";
             read ruby_version;
             echo -e "${CYAN}다음에 실행되는 부분에서 오류가 발생하는지 확인해 주세요.${NC}";
-
+            
             rvm install ruby-$ruby_version;
             # Load RVM into a shell session *as a function*
             # Loading RVM *as a function* is mandatory
             # so that we can use 'rvm use <specific version>'
             if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
                 # First try to load from a user install
-                source "$HOME/.rvm/scripts/rvm";
+                source "$HOME/.rvm/scripts/rvm"; >/dev/null
                 echo "using user install $HOME/.rvm/scripts/rvm";
             elif [[ -s "/usr/local/rvm/scripts/rvm" ]] ; then
                 # Then try to load from a root install
-                source "/usr/local/rvm/scripts/rvm";
+                source "/usr/local/rvm/scripts/rvm"; >/dev/null
                 echo "using root install /usr/local/rvm/scripts/rvm";
             else
                 echo "ERROR: An RVM installation was not found.\n";
@@ -106,29 +108,34 @@ if [ -f ".progress" ] ; then
             MA=$myapp
 
             export MA
-            sudo -u $myappuser -H sh -c "
-            if [[ -s \"$HOME/.rvm/scripts/rvm\" ]] ; then
-            # First try to load from a user install
-            source \"$HOME/.rvm/scripts/rvm\"
-            elif [[ -s \"/usr/local/rvm/scripts/rvm\" ]] ; then
-            # Then try to load from a root install
-            source \"/usr/local/rvm/scripts/rvm\"
-            else
-            printf \"ERROR: An RVM installation was not found.\n\"
-            fi
+            
 
-            set -e
-            export PS4=\"+ \${BASH_SOURCE##\${rvm_path:-}} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()}  \${LINENO} > \"
+            sudo -u $myappuser -H sh -c "
+            echo -e \"${CYAN}$myappuser shell에서 설정을 시작합니다.${NC}\";
+            printf \"if test -f ~/.rvm/scripts/rvm; then\n  [ "$(type -t rvm)" = "function" ] || source ~/.rvm/scripts/rvm\nfi\n\" >> .bashrc
+            
+            # if [ -s \"$HOME/.rvm/scripts/rvm\" ] ; then
+            # # First try to load from a user install
+            #     source \"$HOME/.rvm/scripts/rvm\";
+            #     echo \"using user install $HOME/.rvm/scripts/rvm\";
+            # elif [ -s \"/usr/local/rvm/scripts/rvm\" ] ; then
+            # # Then try to load from a root install
+            #     source \"/usr/local/rvm/scripts/rvm\";
+            #     echo \"using user install /usr/local/rvm/scripts/rvm\";
+            # else
+            #     printf \"ERROR: An RVM installation was not found.\n\"
+            # fi
+            # export PATH=$PATH:/var/lib/gems/$RV/bin;
             rvm use ruby-$RV;
 
             cd /var/www/$MA/code;
             bundle install --deployment --without development test -j 2;
             printf '  adapter: sqlite3' >> config/database.yml;
             secret_key=`bundle exec rake secret`;
-            sed -i '22s/' config/secrets.yml;
+            sed -i '22d/' config/secrets.yml;
             echo '  secret_key_base: $secret_key' >> config/secrets.yml;
 
-            chmod 700 config deb;
+            chmod 700 config db;
             chmod 600 config/database.yml config/secrets.yml;
             bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
             COM=`passenger-config about ruby-command | grep -i \"Command:\" `;
@@ -139,7 +146,6 @@ if [ -f ".progress" ] ; then
             echo "4" > ~/.progress;
         ;;
         "4")
-            echo "step4";
             echo -e "${CYAN}server 주소를 입력하세요(http:// 제외)"
             printf "입력 : ${NC}";
             read server;
@@ -170,5 +176,7 @@ else
     touch ~/.progress;
     echo 1 > ~/.progress;
 fi
+export -n CYAN;
+export -n NC;
 unset CYAN;
 unset NC;
