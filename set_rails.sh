@@ -15,7 +15,7 @@ if [ -f ".progress" ] ; then
             printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력을 안하면 최신 버전 으로 설치합니다.\n";
             printf "입력 : ${NC}";
             read ruby_version;
-            echo -e "${CYAN}다음에 실행되는 부분에서 오류가 발생하는지 확인해 주세요.${NC}";
+            # echo -e "${CYAN}다음에 실행되는 부분에서 오류가 발생하는지 확인해 주세요.${NC}";
             
             rvm install ruby-$ruby_version;
             # Load RVM into a shell session *as a function*
@@ -145,7 +145,7 @@ if [ -f ".progress" ] ; then
             COM=`passenger-config about ruby-command | grep -i "Command:" `;
             COM=${COM:11:100};
             echo -e "${CYAN}마지막으로 서버세팅이 남았습니다.${NC}"
-            echo -e "${CYAN}exit 후에, cd /home/ubuntu/awset; ./set_rails.sh 을 복사,붙여넣기 하세요."
+            echo -e "${CYAN}exit 후에, awset/set_rails.sh 을 복사,붙여넣기 하세요."
             
             # sed -i "4d" /home/ubuntu/.progress;
             echo "comn:$COM" >> /home/ubuntu/.progress; 
@@ -158,12 +158,12 @@ if [ -f ".progress" ] ; then
             temp=`grep comn /home/ubuntu/.progress` ;
             COM=${temp:5:100};
 
-            echo -e "${CYAN}server 주소를 입력하세요(http:// 제외)"
+            echo -e "${CYAN}server 주소를 입력하세요(IPv4 public IP)"
             printf "입력 : ${NC}";
             read server;
             #need to edit /etc/nginx/sites-enabled/myapp.conf
-            sudo touch /etc/nginx/sites-enabled/$MA.conf;
-            sudo -i -H sh -c " printf \"server {\n\tlisten 80;\n\tserver_name $server;\n\n\troot /var/www/$MA/code/public;\n\n\tpassenger_enabled on;\n\tpassenger_ruby $COM;\n}\n\" >> /etc/nginx/sites-enabled/$MA.conf ";
+            # sudo touch /etc/nginx/sites-enabled/$MA.conf;
+            sudo -i -H sh -c " printf \"server {\n\tlisten 80;\n\tserver_name $server;\n\n\troot /var/www/$MA/code/public;\n\n\tpassenger_enabled on;\n\tpassenger_ruby $COM;\n}\n\" > /etc/nginx/sites-enabled/$MA.conf ";
             #finish;
             sudo service nginx restart;
             echo -e "${CYAN}서버 설정 끝, 오류가 없는지 확인하세요.${NC}";
@@ -181,6 +181,8 @@ if [ -f ".progress" ] ; then
 
             echo -e "${CYAN}서버 세팅이 완료되었습니다.";
             echo -e "$server 에 접속하여 제대로 작동하는지 확인하세요${NC}";
+            cd ~;
+            echo -e "${CYAN}제대로 작동하면 rm -r awset 명령으로 shell script 를 삭제하세요.${NC}";
         ;;
     esac
 
@@ -201,7 +203,7 @@ else
     sudo usermod -a -G rvm `whoami` >/dev/null;
     if sudo grep -q secure_path /etc/sudoers; then sudo sh -c "echo export rvmsudo_secure_path=1 >> /etc/profile.d/rvm_secure_path.sh" && echo Environment variable installed; fi
     echo -e "${CYAN}서버 터미널에 다시 접속하세요.${NC}";
-    echo -e "${CYAN}exit 후, awset/set_rails.sh 복사,붙여넣기${NC}";
+    echo -e "${CYAN}exit 후, ssh 통해 다시 접속, awset/set_rails.sh 복사,붙여넣기${NC}";
     touch ~/.progress;
     echo 1 > ~/.progress;
     chmod 777 ~/.progress;
