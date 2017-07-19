@@ -85,13 +85,13 @@ if [ -f ".progress" ] ; then
             echo -e "app 이름 : $myapp\nuser 이름 : $myappuser"
             echo -e "==========================================${NC}"
             sudo adduser $myappuser
-            sudo mkdir -p ~$myappuser/.ssh
-            touch $HOME/.ssh/authorized_keys
-            sudo sh -c "cat $HOME/.ssh/authorized_keys >> ~$myappuser/.ssh/authorized_keys"
-            sudo chown -R $myappuser: ~$myappuser/.ssh
-            sudo chmod 700 ~$myappuser/.ssh
-            sudo sh -c "chmod 600 ~$myappuser/.ssh/*"
-
+            if sudo mkdir -p ~/$myappuser/.ssh && touch $HOME/.ssh/authorized_keys && sudo sh -c "cat $HOME/.ssh/authorized_keys >> ~/$myappuser/.ssh/authorized_keys" && sudo chown -R $myappuser: ~/$myappuser/.ssh && sudo chmod 700 ~/$myappuser/.ssh && sudo sh -c "chmod 600 ~/$myappuser/.ssh/*" ; then
+                echo -e "${CYAN}$myappuser에 대한 기본 설정 완료${NC}";
+            else
+                echo -e "${CYAN}$myappuser에 대한 기본 설정 실패${NC}";
+                exit;
+            fi
+            
             sudo mkdir -p /var/www/$myapp
             sudo chown $myappuser: /var/www/$myapp
             echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/uosHomework.git)\n${NC}"
@@ -128,7 +128,7 @@ if [ -f ".progress" ] ; then
             bundle install --deployment --without development test -j 2;
             printf '  adapter: sqlite3' >> config/database.yml;
             secret_key=`bundle exec rake secret`;
-            sudo sed -i '22s/' config/secrets.yml;
+            sed -i '22s/' config/secrets.yml;
             echo '  secret_key_base: $secret_key' >> config/secrets.yml;
 
             chmod 700 config deb;
