@@ -9,8 +9,9 @@ sudo swapon /swapfile
 echo "/swapfile       swap    swap    auto      0       0" | sudo tee -a /etc/fstab
 sudo sysctl -w vm.swappiness=10
 echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
-echo "$CYAN}swap file 만들기 끝${NC}"
+echo -e "$CYAN}swap file 만들기 끝${NC}"
 
+#install ruby
 printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력안하면 최신으로 설치합니다.\n"
 printf "입력 : ${NC}"
 read ruby_version
