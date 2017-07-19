@@ -15,7 +15,7 @@ printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2
 printf "입력 : ${NC}"
 read ruby_version
 echo -e "${CYAN}$ruby_version 이 설치 됩니다.${NC}"
-sudo -i sh -c "
+sudo -i -H sh -c "
 rvm install ruby-$ruby_version
 rvm --default use ruby-$ruby_version
 
