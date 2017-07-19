@@ -5,7 +5,7 @@ export CYAN;
 export NC;
 # 단계 : 1 : first setting ,2 : install ruby ,3 : 노드,passenger 설치, 4 : 깃-루비 준비, 5 : deploying 작업, 6 : swap file
 
-cd ~
+cd /home/ubuntu;
 
 if [ -f ".progress" ] ; then
     step=`tail -n 1 .progress`;
@@ -37,7 +37,8 @@ if [ -f ".progress" ] ; then
             gem install bundler --no-rdoc --no-ri;
 
             echo -e "${CYAN}위에 로그를 통해, Ruby 설치를 확인해주세요.${NC}";
-            echo "2" > ~/.progress;
+            printf "ruby:$ruby_version\n" > ~/.progress;
+            echo "2" >> ~/.progress;
         ;;
         "2")
             echo -e "${CYAN}노드 설치중${NC}"
@@ -58,8 +59,8 @@ if [ -f ".progress" ] ; then
             
             # echo -e "\n${CYAN}******* gem: command not found 오류가 난 경우, rvm reinstall ruby-(루비버전)\n후에 gem install bundler --no-rdoc --no-ri 을 실행하세요.${NC}"
 
-            export RV=$ruby_version
-            echo -e "${CYAN}Passenger, Nginx 설치 및 설정 시작${NC}"
+            # export RV=$ruby_version
+            echo -e "${CYAN}Passenger, Nginx 설치 및 설정 시작"
             echo -e "${CYAN}설치중...${NC}"
             sudo apt-get install -y nginx-extras passenger >/dev/null
             echo -e "${CYAN}설치끝${NC}"
@@ -69,7 +70,9 @@ if [ -f ".progress" ] ; then
             echo -e "${CYAN}설정끝${NC}"
             sudo service nginx restart
             echo -e "${CYAN}nginx를 재시작 했습니다.\n${NC}"
-            echo "3" > ~/.progress;
+
+            sed -i "2d/" ~/.progress;
+            echo "3" >> ~/.progress;
         ;;
         "3")
             echo -e "${CYAN}서버에 루비를 올리기 위한 작업을 시작합니다.\n원하는대로 app이름과 추가할 username을 입력하세요(enter => default)${NC}"
@@ -106,25 +109,27 @@ if [ -f ".progress" ] ; then
             sudo -u $myappuser -H git clone $github_address code
 
             MA=$myapp
-
             export MA
             
+            echo -e "${CYAN}cd /home/ubuntu/awset; ./allinone.sh 을 복사,붙여넣기 해주세요.${NC}";
 
-            sudo -u $myappuser -H sh -c "
-            echo -e \"${CYAN}$myappuser shell에서 설정을 시작합니다.${NC}\";
-            printf \"if test -f ~/.rvm/scripts/rvm; then\n  [ "$(type -t rvm)" = "function" ] || source ~/.rvm/scripts/rvm\nfi\n\" >> .bashrc
-            
-            # if [ -s \"$HOME/.rvm/scripts/rvm\" ] ; then
-            # # First try to load from a user install
-            #     source \"$HOME/.rvm/scripts/rvm\";
-            #     echo \"using user install $HOME/.rvm/scripts/rvm\";
-            # elif [ -s \"/usr/local/rvm/scripts/rvm\" ] ; then
-            # # Then try to load from a root install
-            #     source \"/usr/local/rvm/scripts/rvm\";
-            #     echo \"using user install /usr/local/rvm/scripts/rvm\";
-            # else
-            #     printf \"ERROR: An RVM installation was not found.\n\"
-            # fi
+            sed -i "2d/" ~/.progress;
+            printf "appn:$myapp\nusen:$myappuser\n" >> ~/.progress;
+            echo "4" >> ~/.progress;
+
+            sudo -u $myappuser -H bash -l;
+        "4")
+            cd ~;
+            temp=`grep appn /home/ubuntu/.progress` ;
+            myappuser=${temp:5:100};
+            temp=`grep ruby /home/ubuntu/.progress` ;
+            RV=${temp:5:100};
+            temp=`grep usen /home/ubuntu/.progress` ;
+            MA=${temp:5:100};
+
+            echo -e "${CYAN}$myappuser shell에서 설정을 시작합니다.${NC}";
+            source "/usr/local/rvm/scripts/rvm";
+            echo "using root install /usr/local/rvm/scripts/rvm";
             # export PATH=$PATH:/var/lib/gems/$RV/bin;
             rvm use ruby-$RV;
 
@@ -132,20 +137,27 @@ if [ -f ".progress" ] ; then
             bundle install --deployment --without development test -j 2;
             printf '  adapter: sqlite3' >> config/database.yml;
             secret_key=`bundle exec rake secret`;
-            sed -i '22d/' config/secrets.yml;
+            sed -i "22d/" config/secrets.yml;
             echo '  secret_key_base: $secret_key' >> config/secrets.yml;
 
             chmod 700 config db;
             chmod 600 config/database.yml config/secrets.yml;
             bundle exec rake assets:precompile db:migrate RAILS_ENV=production;
-            COM=`passenger-config about ruby-command | grep -i \"Command:\" `;
-            COM=${COM:12:100};
-            export $COM;
+            COM=`passenger-config about ruby-command | grep -i "Command:" `;
+            COM=${COM:11:100};
+            echo -e "${CYAN}마지막으로 서버세팅이 남았습니다. /home/abuntu/aws 로 가서 allinone.sh를 실행하세요.${NC}"
+            
+            sed -i "4d/" /home/ubuntu/.progress;
+            echo "comn:$COM" >> /home/ubuntu/.progress; 
+            echo "5" >> /home/ubuntu/.progress;
             exit;
-            "
-            echo "4" > ~/.progress;
         ;;
-        "4")
+        "5")
+            temp=`grep appn /home/ubuntu/.progress` ;
+            MA=${temp:5:100};
+            temp=`grep comn /home/ubuntu/.progress` ;
+            COM=${temp:5:100};
+
             echo -e "${CYAN}server 주소를 입력하세요(http:// 제외)"
             printf "입력 : ${NC}";
             read server;
@@ -155,12 +167,14 @@ if [ -f ".progress" ] ; then
             #finish;
             sudo service nginx restart;
             echo -e "${CYAN}서버 설정 끝, 오류가 없는지 확인하세요.${NC}";
+            rm /home/ubuntu/.progress;
         ;;
     esac
 
 #excuted shell first time..
 else
     echo -e "${CYAN}======여러가지 준비 시작======${NC}";
+    sudo -i -H sh -c " echo 'LC_ALL=\"en_US.UTf-8\"' >> /etc/environment ";
     echo -e "${CYAN}Repository 업데이트 중...${NC}";
     sudo apt-get update > /dev/null;
     echo -e "${CYAN}업데이트 끝\n${NC}";
