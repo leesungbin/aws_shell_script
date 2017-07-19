@@ -182,7 +182,7 @@ if [ -f ".progress" ] ; then
             echo -e "${CYAN}서버 세팅이 완료되었습니다.";
             echo -e "$server 에 접속하여 제대로 작동하는지 확인하세요${NC}";
             cd ~;
-            echo -e "${CYAN}제대로 작동하면 rm -r awset 명령으로 shell script 를 삭제하세요.${NC}";
+            echo -e "${CYAN}제대로 작동하면 sudo rm -r awset 명령으로 shell script 를 삭제하세요.${NC}";
         ;;
     esac
 
