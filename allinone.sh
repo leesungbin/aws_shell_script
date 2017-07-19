@@ -91,7 +91,7 @@ if [ -f ".progress" ] ; then
                 echo -e "${CYAN}$myappuser에 대한 기본 설정 실패${NC}";
                 exit;
             fi
-            
+
             sudo mkdir -p /var/www/$myapp
             sudo chown $myappuser: /var/www/$myapp
             echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/uosHomework.git)\n${NC}"
@@ -107,21 +107,18 @@ if [ -f ".progress" ] ; then
 
             export MA
             sudo -u $myappuser -H sh -c "
-            # Load RVM into a shell session *as a function*
-            # Loading RVM *as a function* is mandatory
-            # so that we can use 'rvm use <specific version>'
             if [[ -s \"$HOME/.rvm/scripts/rvm\" ]] ; then
-                # First try to load from a user install
-                source \"$HOME/.rvm/scripts/rvm\";
-                echo \"using user install $HOME/.rvm/scripts/rvm\";
+            # First try to load from a user install
+            source \"$HOME/.rvm/scripts/rvm\"
             elif [[ -s \"/usr/local/rvm/scripts/rvm\" ]] ; then
-                # Then try to load from a root install
-                source \"/usr/local/rvm/scripts/rvm\";
-                echo \"using root install /usr/local/rvm/scripts/rvm\";
+            # Then try to load from a root install
+            source \"/usr/local/rvm/scripts/rvm\"
             else
-                echo \"ERROR: An RVM installation was not found.\n\";
+            printf \"ERROR: An RVM installation was not found.\n\"
             fi
 
+            set -e
+            export PS4=\"+ \${BASH_SOURCE##\${rvm_path:-}} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()}  \${LINENO} > \"
             rvm use ruby-$RV;
 
             cd /var/www/$MA/code;
