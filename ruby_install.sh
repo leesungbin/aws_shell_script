@@ -15,23 +15,21 @@ printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2
 printf "입력 : ${NC}"
 read ruby_version
 echo -e "${CYAN}$ruby_version 이 설치 됩니다.${NC}"
-sudo -i -H sh -c "
 rvm install ruby-$ruby_version
 rvm --default use ruby-$ruby_version
-
-gem install bundler --no-rdoc --no-ri"
+gem install bundler --no-rdoc --no-ri
 echo -e "${CYAN}****************bundle gem 설치(오류확인)************\n${NC}"
 echo -e "${CYAN}1 gem installed 가 뜨면 정상${NC}"
 printf "${CYAN}오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n"
 printf "입력 : ${NC}"
 read error_occured
 if [ $error_occured == "1" ] ; then
-    rvm --default use ruby-$ruby_version
+    rvm --default use ruby-$ruby_version;
     gem install bundler --no-rdoc --no-ri;
 fi
 while [ $error_occured == "1" ] ; do
     printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
-    printf "제대로 젬이 설치되지 않는다고 계속되면, 망한겁니다. 왜 이러는지 모르겠음.${NC}\n";
+    printf "제대로 젬이 설치되지 않는다고 계속되면, 수동으로 해주세요.. 왜 이러는지 모르겠음.${NC}\n";
     read error_occured;
     sudo rvm --default use ruby-$ruby_version
     gem install bundler --no-rdoc --no-ri;
@@ -78,6 +76,7 @@ fi
 echo -e "${CYAN}=========================================="
 echo -e "app 이름 : $myapp\nuser 이름 : $myappuser"
 echo -e "==========================================${NC}"
+cd ~
 sudo adduser $myappuser
 sudo mkdir -p ~$myappuser/.ssh
 touch $HOME/.ssh/authorized_keys
