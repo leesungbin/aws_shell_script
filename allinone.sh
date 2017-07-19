@@ -3,7 +3,7 @@ CYAN='\e[0;36m';
 NC='\e[0m';
 export CYAN;
 export NC;
-# 단계 : null : first setting ,1 : install ruby ,2 : 노드,passenger 설치, 3 : 깃-루비 준비, 4 : deploying 작업, 5 : final serverset, 6: swapfile
+# 단계 : null : first setting ,1 : install ruby ,2 : 노드,passenger 설치, 3 : 깃-루비 준비, 4 : deploying 작업, 5 : final server set, swapfile
 
 cd /home/ubuntu;
 
@@ -36,16 +36,16 @@ if [ -f ".progress" ] ; then
             rvm --default use ruby-$ruby_version;
             gem install bundler --no-rdoc --no-ri;
 
-            echo -e "${CYAN}위에 로그를 통해, Ruby 설치를 확인해주세요.${NC}";
+            # echo -e "${CYAN}위에 로그를 통해, Ruby 설치를 확인해주세요.${NC}";
             printf "ruby:$ruby_version\n" > ~/.progress;
-            echo "2" >> ~/.progress;
-        ;;
-        "2")
+            # echo "2" >> ~/.progress;
+        # ;;
+        # "2")
             echo -e "${CYAN}노드 설치중${NC}"
             sudo apt-get install -y nodejs > /dev/null
 
-            echo -e "${CYAN}루비, 노드js 설치 끝\n\n${NC}\n\n"
-            echo -e "${CYAN}======Passengers를 설치과정을 진행합니다.=====${NC}"
+            echo -e "${CYAN}루비, 노드js 설치 끝\n\n${NC}"
+            echo -e "${CYAN}Passengers를 설치과정을 진행합니다.${NC}"
 
             sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 >/dev/null
             sudo apt-get install -y apt-transport-https ca-certificates >/dev/null
@@ -71,10 +71,10 @@ if [ -f ".progress" ] ; then
             sudo service nginx restart
             echo -e "${CYAN}nginx를 재시작 했습니다.\n${NC}"
 
-            sed -i "2d" ~/.progress;
-            echo "3" >> ~/.progress;
-        ;;
-        "3")
+            # sed -i "2d" ~/.progress;
+            # echo "3" >> ~/.progress;
+        # ;;
+        # "3")
             echo -e "${CYAN}서버에 루비를 올리기 위한 작업을 시작합니다.\n원하는대로 app이름과 추가할 username을 입력하세요(enter => default)${NC}"
             printf "app이름 : "
             read myapp
@@ -110,7 +110,7 @@ if [ -f ".progress" ] ; then
             
             echo -e "${CYAN}cd /home/ubuntu/awset; ./allinone.sh 을 복사,붙여넣기 해주세요.${NC}";
 
-            sed -i "2d" ~/.progress;
+            # sed -i "2d" ~/.progress;
             printf "appn:$myapp\nusen:$myappuser\n" >> ~/.progress;
             echo "4" >> ~/.progress;
 
@@ -145,7 +145,7 @@ if [ -f ".progress" ] ; then
             COM=`passenger-config about ruby-command | grep -i "Command:" `;
             COM=${COM:11:100};
             echo -e "${CYAN}마지막으로 서버세팅이 남았습니다.${NC}"
-            echo -e "${CYAN}cd /home/abuntu/aws; ./allinone.sh 을 복사,붙여넣기 하세요."
+            echo -e "${CYAN}exit 후에, cd /home/abuntu/aws; ./allinone.sh 을 복사,붙여넣기 하세요."
             
             # sed -i "4d" /home/ubuntu/.progress;
             echo "comn:$COM" >> /home/ubuntu/.progress; 
@@ -162,18 +162,32 @@ if [ -f ".progress" ] ; then
             printf "입력 : ${NC}";
             read server;
             #need to edit /etc/nginx/sites-enabled/myapp.conf
-            sed -i "3,11d" /etc/nginx/sites-enabled/$MA.conf;
-            printf "\tserver_name $server;\n\n\troot /var/www/$MA/code/public;\n\n\tpassenger_enabled on;\n\tpassenger_ruby $COM;\n}" >> /etc/nginx/sites-enabled/$MA.conf;
+            touch /etc/nginx/sites-enabled/$MA.conf;
+            sudo -i -H sh -c " printf \"server {\n\tlisten 80;\n\tserver_name $server;\n\n\troot /var/www/$MA/code/public;\n\n\tpassenger_enabled on;\n\tpassenger_ruby $COM;\n}\" >> /etc/nginx/sites-enabled/$MA.conf ";
             #finish;
             sudo service nginx restart;
             echo -e "${CYAN}서버 설정 끝, 오류가 없는지 확인하세요.${NC}";
             rm /home/ubuntu/.progress;
+            
+            echo -e "${CYAN}swap파일을 만듭니다.${NC}";
+            echo -e "${CYAN}swap file을 만드는중..${NC}";
+            sudo dd  if=/dev/zero of=/swapfile bs=1M count=2048;
+            sudo mkswap /swapfile;
+            sudo swapon /swapfile;
+            echo "/swapfile       swap    swap    auto      0       0" | sudo tee -a /etc/fstab;
+            sudo sysctl -w vm.swappiness=10;
+            echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf;
+            echo -e "${CYAN}swap file 만들기 끝${NC}";
+
+            echo -e "${CYAN}서버 세팅이 완료되었습니다.";
+            echo -e "$server 에 접속하여 제대로 작동하는지 확인하세요${NC}";
         ;;
     esac
 
 #excuted shell first time..
 else
-    echo -e "${CYAN}======여러가지 준비 시작======${NC}";
+    echo "";
+    echo -e "${CYAN}여러가지 준비를 시작합니다.${NC}";
     sudo -i -H sh -c " echo 'LC_ALL=\"en_US.UTf-8\"' >> /etc/environment ";
     echo -e "${CYAN}Repository 업데이트 중...${NC}";
     sudo apt-get update > /dev/null;
