@@ -118,20 +118,21 @@ if [ -f ".progress" ] ; then
         ;;
         "4")
             cd ~;
-            temp=`grep appn /home/ubuntu/.progress` ;
+            temp=`grep usen /home/ubuntu/.progress` ;
             myappuser=${temp:5:100};
             temp=`grep ruby /home/ubuntu/.progress` ;
             RV=${temp:5:100};
-            temp=`grep usen /home/ubuntu/.progress` ;
+            temp=`grep appn /home/ubuntu/.progress` ;
             MA=${temp:5:100};
 
             echo -e "${CYAN}$myappuser shell에서 설정을 시작합니다.${NC}";
-            # source "/usr/local/rvm/scripts/rvm";
+            source "/usr/local/rvm/scripts/rvm";
             # echo "using root install /usr/local/rvm/scripts/rvm";
             # export PATH=$PATH:/var/lib/gems/$RV/bin;
             rvm use ruby-$RV;
 
             cd /var/www/$MA/code;
+            
             bundle install --deployment --without development test -j 2;
             printf '  adapter: sqlite3' >> config/database.yml;
             secret_key=`bundle exec rake secret`;
@@ -187,7 +188,7 @@ else
     echo -e "${CYAN}서버 터미널에 다시 접속하세요.${NC}";
     touch ~/.progress;
     echo 1 > ~/.progress;
-    chmod 666 ~/.progress;
+    chmod 777 ~/.progress;
 fi
 export -n CYAN;
 export -n NC;
