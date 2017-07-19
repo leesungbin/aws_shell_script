@@ -12,7 +12,7 @@ if [ -f ".progress" ] ; then
 
     case $step in
         "1")
-            printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력안하면 최신으로 설치합니다.\n";
+            printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력을 안하면 최신 버전 으로 설치합니다.\n";
             printf "입력 : ${NC}";
             read ruby_version;
             echo -e "${CYAN}다음에 실행되는 부분에서 오류가 발생하는지 확인해 주세요.${NC}";
@@ -134,10 +134,10 @@ if [ -f ".progress" ] ; then
             cd /var/www/$MA/code;
             
             bundle install --deployment --without development test -j 2;
-            printf '  adapter: sqlite3' >> config/database.yml;
+            printf '  adapter: sqlite3\n' >> config/database.yml;
             secret_key=`bundle exec rake secret`;
             sed -i "22d" config/secrets.yml;
-            echo '  secret_key_base: $secret_key' >> config/secrets.yml;
+            echo "  secret_key_base: $secret_key" >> config/secrets.yml;
 
             chmod 700 config db;
             chmod 600 config/database.yml config/secrets.yml;
@@ -147,7 +147,7 @@ if [ -f ".progress" ] ; then
             echo -e "${CYAN}마지막으로 서버세팅이 남았습니다.${NC}"
             echo -e "${CYAN}cd /home/abuntu/aws; ./allinone.sh 을 복사,붙여넣기 하세요."
             
-            sed -i "4d" /home/ubuntu/.progress;
+            # sed -i "4d" /home/ubuntu/.progress;
             echo "comn:$COM" >> /home/ubuntu/.progress; 
             echo "5" >> /home/ubuntu/.progress;
             exit;
