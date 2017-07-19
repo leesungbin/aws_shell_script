@@ -2,39 +2,39 @@
 CYAN='\e[0;36m'
 NC='\e[0m'
 
-echo "${CYAN}swap file을 만드는중.."
-sudo dd  if=/dev/zero of=/swapfile bs=1k count=2048k
-mkswap /swapfile
-swapon /swapfile
+echo -e "${CYAN}swap file을 만드는중..${NC}"
+sudo dd  if=/dev/zero of=/swapfile bs=1M count=2048
+sudo mkswap /swapfile
+sudo swapon /swapfile
 echo "/swapfile       swap    swap    auto      0       0" | sudo tee -a /etc/fstab
 sudo sysctl -w vm.swappiness=10
 echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
-echo "swap file 만들기 끝${NC}"
+echo "$CYAN}swap file 만들기 끝${NC}"
 
 printf "${CYAN}설치를 원하는 루비 버전을 입력하세요(ex 2.3.0 / 2.4.1)\n입력안하면 최신으로 설치합니다.\n"
 printf "입력 : ${NC}"
 read ruby_version
 echo -e "${CYAN}$ruby_version 이 설치 됩니다.${NC}"
+sudo -i sh -c "
 rvm install ruby-$ruby_version
 rvm --default use ruby-$ruby_version
 
-gem install bundler --no-rdoc --no-ri
+gem install bundler --no-rdoc --no-ri"
 echo -e "${CYAN}****************bundle gem 설치(오류확인)************\n${NC}"
 echo -e "${CYAN}1 gem installed 가 뜨면 정상${NC}"
 printf "${CYAN}오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n"
 printf "입력 : ${NC}"
 read error_occured
 if [ $error_occured == "1" ] ; then
-    rvm reinstall ruby-$ruby_version;
     rvm --default use ruby-$ruby_version
     gem install bundler --no-rdoc --no-ri;
 fi
 while [ $error_occured == "1" ] ; do
     printf "${CYAN}또 오류가 발생했으면 1을 입력해주세요.(정상 : <enter>)\n";
-    printf "${CYAN}제대로 젬이 설치되지 않는다고 계속되면, 망한겁니다. 왜 이러는지 모르겠음.\n";
+    printf "제대로 젬이 설치되지 않는다고 계속되면, 망한겁니다. 왜 이러는지 모르겠음.${NC}\n";
     read error_occured;
-    sudo gem install bundler --no-rdoc --no-ri;
-    rvm --default use ruby-$ruby_version
+    sudo rvm --default use ruby-$ruby_version
+    gem install bundler --no-rdoc --no-ri;
 done
 echo -e "${CYAN}노드 설치중${NC}"
 sudo apt-get install -y nodejs > /dev/null
