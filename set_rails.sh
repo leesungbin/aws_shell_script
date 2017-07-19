@@ -41,7 +41,7 @@ if [ -f ".progress" ] ; then
             # echo "2" >> ~/.progress;
         # ;;
         # "2")
-            echo -e "${CYAN}노드 설치중${NC}"
+            echo -e "${CYAN}\n노드 설치중${NC}"
             sudo apt-get install -y nodejs > /dev/null
 
             echo -e "${CYAN}루비, 노드js 설치 끝\n\n${NC}"
@@ -99,16 +99,16 @@ if [ -f ".progress" ] ; then
 
             sudo mkdir -p /var/www/$myapp
             sudo chown $myappuser: /var/www/$myapp
-            echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/uosHomework.git)\n${NC}"
+            echo -e "${CYAN}루비가 올라가 있는 깃헙 주소를 입력하세요\n(default : https://github.com/leesungbin/aws.git)\n${NC}"
             printf "입력 :"
             read github_address
             if [ -z "$github_address" ] ; then
-                github_address="https://github.com/leesungbin/uosHomework.git"
+                github_address="https://github.com/leesungbin/aws.git"
             fi
             cd /var/www/$myapp
             sudo -u $myappuser -H git clone $github_address code
             
-            echo -e "${CYAN}cd /home/ubuntu/awset; ./allinone.sh 을 복사,붙여넣기 해주세요.${NC}";
+            echo -e "${CYAN}cd /home/ubuntu/awset; ./set_rails.sh 을 복사,붙여넣기 해주세요.${NC}";
 
             # sed -i "2d" ~/.progress;
             printf "appn:$myapp\nusen:$myappuser\n" >> ~/.progress;
@@ -145,7 +145,7 @@ if [ -f ".progress" ] ; then
             COM=`passenger-config about ruby-command | grep -i "Command:" `;
             COM=${COM:11:100};
             echo -e "${CYAN}마지막으로 서버세팅이 남았습니다.${NC}"
-            echo -e "${CYAN}exit 후에, cd /home/abuntu/aws; ./allinone.sh 을 복사,붙여넣기 하세요."
+            echo -e "${CYAN}exit 후에, cd /home/ubuntu/awset; ./set_rails.sh 을 복사,붙여넣기 하세요."
             
             # sed -i "4d" /home/ubuntu/.progress;
             echo "comn:$COM" >> /home/ubuntu/.progress; 
@@ -162,8 +162,8 @@ if [ -f ".progress" ] ; then
             printf "입력 : ${NC}";
             read server;
             #need to edit /etc/nginx/sites-enabled/myapp.conf
-            touch /etc/nginx/sites-enabled/$MA.conf;
-            sudo -i -H sh -c " printf \"server {\n\tlisten 80;\n\tserver_name $server;\n\n\troot /var/www/$MA/code/public;\n\n\tpassenger_enabled on;\n\tpassenger_ruby $COM;\n}\" >> /etc/nginx/sites-enabled/$MA.conf ";
+            sudo touch /etc/nginx/sites-enabled/$MA.conf;
+            sudo -i -H sh -c " printf \"server {\n\tlisten 80;\n\tserver_name $server;\n\n\troot /var/www/$MA/code/public;\n\n\tpassenger_enabled on;\n\tpassenger_ruby $COM;\n}\n\" >> /etc/nginx/sites-enabled/$MA.conf ";
             #finish;
             sudo service nginx restart;
             echo -e "${CYAN}서버 설정 끝, 오류가 없는지 확인하세요.${NC}";
@@ -201,6 +201,7 @@ else
     sudo usermod -a -G rvm `whoami` >/dev/null;
     if sudo grep -q secure_path /etc/sudoers; then sudo sh -c "echo export rvmsudo_secure_path=1 >> /etc/profile.d/rvm_secure_path.sh" && echo Environment variable installed; fi
     echo -e "${CYAN}서버 터미널에 다시 접속하세요.${NC}";
+    echo -e "${CYAN}exit 후, awset/set_rails.sh 복사,붙여넣기${NC}";
     touch ~/.progress;
     echo 1 > ~/.progress;
     chmod 777 ~/.progress;
