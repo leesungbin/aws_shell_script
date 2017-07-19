@@ -108,7 +108,7 @@ if [ -f ".progress" ] ; then
             cd /var/www/$myapp
             sudo -u $myappuser -H git clone $github_address code
             
-            echo -e "${CYAN}cd /home/ubuntu/awset; ./set_rails.sh 을 복사,붙여넣기 해주세요.${NC}";
+            echo -e "${CYAN}/home/ubuntu/awset/set_rails.sh 을 복사,붙여넣기 해주세요.${NC}";
 
             # sed -i "2d" ~/.progress;
             printf "appn:$myapp\nusen:$myappuser\n" >> ~/.progress;
